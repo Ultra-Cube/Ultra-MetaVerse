@@ -41,8 +41,8 @@ export class GataOSIntegration extends EventEmitter {
         this.emit('gata-os-unavailable');
       }
     } catch (error) {
-      console.warn('Gata-OS detection failed:', error);
-      this.emit('gata-os-detection-failed', { error: error.message });
+      console.warn(`Gata-OS detection failed:`, error);
+      this.emit('gata-os-detection-failed', { error: (error as Error).message });
     }
   }
 

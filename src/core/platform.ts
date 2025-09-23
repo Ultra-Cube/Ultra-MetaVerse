@@ -199,7 +199,7 @@ export class UltraMetaVersePlatform extends EventEmitter {
         
         res.json({ tool });
       } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: (error as Error).message });
       }
     });
 
@@ -230,7 +230,7 @@ export class UltraMetaVersePlatform extends EventEmitter {
         return res.status(404).json({ error: 'Engine not found' });
       }
       
-      res.json({ success: true });
+      return res.json({ success: true });
     });
 
     router.post('/ai/engines/:engineId/credentials', (req, res) => {
@@ -243,7 +243,7 @@ export class UltraMetaVersePlatform extends EventEmitter {
         return res.status(404).json({ error: 'Engine not found' });
       }
       
-      res.json({ success: true });
+      return res.json({ success: true });
     });
 
     // Gata-OS integration
@@ -264,7 +264,7 @@ export class UltraMetaVersePlatform extends EventEmitter {
         
         res.json({ session });
       } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: (error as Error).message });
       }
     });
 
@@ -287,7 +287,7 @@ export class UltraMetaVersePlatform extends EventEmitter {
         
         res.json({ consent });
       } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: (error as Error).message });
       }
     });
 
@@ -303,7 +303,7 @@ export class UltraMetaVersePlatform extends EventEmitter {
         
         res.json({ task });
       } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: (error as Error).message });
       }
     });
 
@@ -432,7 +432,7 @@ export class UltraMetaVersePlatform extends EventEmitter {
     } catch (error) {
       this.sendToClient(clientId, {
         type: 'ai-error',
-        data: { requestId: data.id, error: error.message },
+        data: { requestId: data.id, error: (error as Error).message },
       });
     }
   }
@@ -587,7 +587,7 @@ export class UltraMetaVersePlatform extends EventEmitter {
     console.error('Express error:', error);
     
     res.status(error.status || 500).json({
-      error: error.message || 'Internal server error',
+      error: (error as Error).message || 'Internal server error',
       timestamp: new Date().toISOString(),
     });
   }
@@ -612,9 +612,9 @@ export class UltraMetaVersePlatform extends EventEmitter {
         this.server.on('upgrade', (request: any, socket: any, head: any) => {
           const pathname = new URL(request.url, `http://${request.headers.host}`).pathname;
           
-          if (pathname === '/ws') {
+          if (pathname === '/ws' && this.wsServer) {
             this.wsServer.handleUpgrade(request, socket, head, (ws) => {
-              this.wsServer.emit('connection', ws, request);
+              this.wsServer!.emit('connection', ws, request);
             });
           } else {
             socket.destroy();
